@@ -1,0 +1,12 @@
+{
+  "name": "new-relic-webview-demo",
+  "private": true,
+  "scripts": {
+    "install:all": "npm --prefix apps/web ci && npm --prefix apps/mobile ci",
+    "web": "npm --prefix apps/web run dev",
+    "web:build": "npm --prefix apps/web run build",
+    "ios:broken": "npm --prefix apps/mobile run ios:broken",
+    "ios:fixed": "npm --prefix apps/mobile run ios:fixed",
+    "check": "npm --prefix apps/web run lint && npm --prefix apps/web run build && npm --prefix apps/mobile run lint && npm --prefix apps/mobile run typecheck && npm --prefix apps/mobile test"
+  }
+}

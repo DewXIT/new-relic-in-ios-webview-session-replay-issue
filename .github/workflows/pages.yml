@@ -1,0 +1,44 @@
+name: Deploy demo page
+on:
+  push:
+    branches: [main]
+    paths: ['apps/web/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.1'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - uses: actions/configure-pages@v5
+      - run: npm ci
+        working-directory: apps/web
+      - run: npm run build
+        working-directory: apps/web
+        env:
+          NEXT_PUBLIC_BASE_PATH: /new-relic-in-ios-webview-session-replay-issue
+          NEXT_PUBLIC_NR_ACCOUNT_ID: ${{ vars.NEXT_PUBLIC_NR_ACCOUNT_ID }}
+          NEXT_PUBLIC_NR_TRUST_KEY: ${{ vars.NEXT_PUBLIC_NR_TRUST_KEY }}
+          NEXT_PUBLIC_NR_AGENT_ID: ${{ vars.NEXT_PUBLIC_NR_AGENT_ID }}
+          NEXT_PUBLIC_NR_LICENSE_KEY: ${{ vars.NEXT_PUBLIC_NR_LICENSE_KEY }}
+          NEXT_PUBLIC_NR_APPLICATION_ID: ${{ vars.NEXT_PUBLIC_NR_APPLICATION_ID }}
+          NEXT_PUBLIC_NR_BEACON: ${{ vars.NEXT_PUBLIC_NR_BEACON }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/out
+      - uses: actions/deploy-pages@v4
+        id: deployment
